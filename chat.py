@@ -1,16 +1,19 @@
 import os
 
+from preprocess import Preprocess
 
-class Chat():
+
+class Chat(Preprocess):
 
     def __init__(self, whatsapp, name):
         self.whatsapp = whatsapp
         self.name = name
-        self.set_path()
+        self.set_paths()
 
-    def set_path(self):
-        self.path = os.path.join(self.whatsapp.path_base,
-                                 self.name)
+    def set_paths(self):
+        self.path_folder = self.whatsapp.get_path(self.name)
+        self.path_chat = os.path.join(self.path_folder,
+                                      "_chat.txt")
 
     def preprocess(self):
-        print(f"Preprocessing {self.name}")
+        self.construct_dataframe()
