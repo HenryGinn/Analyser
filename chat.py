@@ -1,9 +1,10 @@
-import os
+from os.path import join
 
 from preprocess import Preprocess
+from people import People
 
 
-class Chat(Preprocess):
+class Chat(Preprocess, People):
 
     def __init__(self, whatsapp, name):
         self.whatsapp = whatsapp
@@ -12,8 +13,6 @@ class Chat(Preprocess):
 
     def set_paths(self):
         self.path_folder = self.whatsapp.get_path(self.name)
-        self.path_chat = os.path.join(self.path_folder,
-                                      "_chat.txt")
-
-    def preprocess(self):
-        self.construct_dataframe()
+        self.path_chat_original = join(
+            self.path_folder, "_chat.txt")
+        self.path_chat = join(self.path_folder, "Chat.pkl")

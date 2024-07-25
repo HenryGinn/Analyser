@@ -1,21 +1,61 @@
-import re
+from re import search, sub
+from os import rename
+from os.path import isfile
 
 import pandas as pd
 
+from base import Base
 
-class Preprocess():
 
-    def construct_dataframe(self):
-        self.extract_data_from_file()
+class Preprocess(Base):
+
+    def preprocess(self):
+        if self.force or not isfile(self.path_chat):
+            self.update_chat_name()
+            self.preprocess_original_chat_file()
+
+
+    # Ensuring the folder name is correct
+
+    def update_chat_name(self):
+        if "WhatsApp Chat - " in self.name:
+            self.set_new_name()
+            self.update_folder_name()
+            self.update_chat_objects()
+
+    def set_new_name(self):
+        self.old_name = self.name
+        self.name = self.old_name[16:]
+
+    def update_folder_name(self):
+        old_path = self.get_path(self.old_name)
+        new_path = self.get_path(self.name)
+        rename(old_path, new_path)
+
+    def update_chat_objects(self):
+        self.whatsapp.chat_objects[self.name] = (
+            self.whatsapp.chat_objects.pop(self.old_name))
+
+    # Parsing the original chat file and saving dataframe
+
+    def preprocess_original_chat_file(self):
+        self.extract_data_from_original_chat_file()
+        self.create_chat_dict()
+        self.construct_dataframe()
+        self.save_dataframe()
+
+    def create_chat_dict(self):
         self.initialise_chat_dict()
         self.populate_chat_dict()
-        self.create_dataframe()
-        self.filter_initial_messages()
 
-    def extract_data_from_file(self):
+    def construct_dataframe(self):
+        self.create_dataframe()
+        self.remove_messages_from_whatsapp()
+
+    def extract_data_from_original_chat_file(self):
         pattern = r'[\u200e\u200f\u202a\u202b\u202c\u202d\u202e\n\r]'
-        with open(self.path_chat, "r") as file:
-            self.data = [re.sub(pattern, '', line)
+        with open(self.path_chat_original, "r") as file:
+            self.data = [sub(pattern, '', line)
                          for line in file]
 
     def initialise_chat_dict(self):
@@ -35,13 +75,13 @@ class Preprocess():
 
     def message_start(self, line):
         pattern = r"\[\d{2}/\d{2}/\d{4}, \d{2}:\d{2}:\d{2}\]"
-        starts_with_timestamp = bool(re.search(pattern, line[:22]))
+        starts_with_timestamp = bool(search(pattern, line[:22]))
         return starts_with_timestamp
 
     def contains_photo(self, line):
         pattern = (r"<attached: \d{8}-(GIF|PHOTO)-\d{4}-\d{2}"
                    r"-\d{2}-\d{2}-\d{2}-\d{2}\.(mp4|jpg)>")
-        photo = bool(re.search(pattern, line)) or (line == "image omitted")
+        photo = bool(search(pattern, line)) or (line == "image omitted")
         return photo
 
     def process_message(self, message):
@@ -70,8 +110,11 @@ class Preprocess():
             self.df["Timestamp"], format="[%d/%m/%Y, %H:%M:%S]")
         self.df = self.df.set_index("Timestamp").reindex(columns=data_types.keys())
 
-    def filter_initial_messages(self):
-        message = ("Messages and calls are end-to-end encrypted. "
-                   "No one outside of this chat, not even "
-                   "WhatsApp, can read or listen to them.")
-        self.df = self.df.loc[self.df["Content"] != message]
+    def remove_messages_from_whatsapp(self):
+        self.df = self.df.loc[self.df["Sender"] != self.name]
+
+    def save_dataframe(self):
+        self.df.to_pickle(self.path_chat)
+
+    def read(self):
+        self.df = pd.read_pickle(self.path_chat)
