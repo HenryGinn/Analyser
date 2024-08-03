@@ -4,10 +4,10 @@ from os.path import isfile
 
 import pandas as pd
 
-from base import Base
+from Elements.base import Base
 
 
-class Preprocess(Base):
+class PreprocessWhatsapp(Base):
 
     def preprocess(self):
         if self.force or not isfile(self.path_chat):
@@ -22,19 +22,21 @@ class Preprocess(Base):
             self.set_new_name()
             self.update_folder_name()
             self.update_chat_objects()
+        self.set_paths()
 
     def set_new_name(self):
         self.old_name = self.name
         self.name = self.old_name[16:]
 
     def update_folder_name(self):
-        old_path = self.get_path(self.old_name)
-        new_path = self.get_path(self.name)
+        old_path = self.service.get_path_chat(self.old_name)
+        new_path = self.service.get_path_chat(self.name)
         rename(old_path, new_path)
 
     def update_chat_objects(self):
-        self.whatsapp.chat_objects[self.name] = (
-            self.whatsapp.chat_objects.pop(self.old_name))
+        self.service.chat_objects[self.name] = (
+            self.service.chat_objects.pop(self.old_name))
+
 
     # Parsing the original chat file and saving dataframe
 

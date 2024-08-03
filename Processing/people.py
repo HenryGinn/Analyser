@@ -2,7 +2,7 @@ import pandas as pd
 from re import split
 from numpy import sqrt
 
-from base import Base
+from Elements.base import Base
 
 
 class People(Base):
