@@ -1,10 +1,6 @@
-from whatsapp import WhatsApp
+from Spotify.spotify import Spotify
 
-path = "/home/henry/Downloads/WhatsApp Chats"
+path = "/home/henry/Documents/Stuff/Data From Services/Spotify"
 
-whatsapp = WhatsApp(path)
-whatsapp.initialise_chats()
-#whatsapp.process("preprocess", force=True)
-whatsapp.process("read")
-self = whatsapp.chat_objects["Connections"]
-whatsapp.process("people")
+spotify = Spotify(path)
+spotify.preprocess()

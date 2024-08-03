@@ -4,7 +4,7 @@ from os.path import isfile
 
 import pandas as pd
 
-from Elements.base import Base
+from Processing.base import Base
 
 
 class PreprocessWhatsapp(Base):
