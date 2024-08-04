@@ -3,4 +3,8 @@ from Spotify.spotify import Spotify
 path = "/home/henry/Documents/Stuff/Data From Services/Spotify"
 
 spotify = Spotify(path)
-spotify.preprocess()
+#spotify.preprocess()
+spotify.read()
+spotify.top_key("Track")
+spotify.top_key("Artist")
+spotify.top_key("Album")

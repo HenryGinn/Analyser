@@ -49,6 +49,7 @@ class PreprocessSpotify(Base):
         self.postprocess_dataframe_drop_columns()
         self.postprocess_dataframe_set_types()
         self.postprocess_dataframe_rename_columns()
+        self.postprocess_dataframe_add_count_column()
         self.postprocess_dataframe_set_index()
 
     def postprocess_dataframe_drop_columns(self):
@@ -68,14 +69,24 @@ class PreprocessSpotify(Base):
                       self.column_processing_dict.items()}
         self.df = self.df.rename(columns=names_dict)
 
+    def postprocess_dataframe_add_count_column(self):
+        self.df.loc[:, "Count"] = 1
+        self.df = self.df.astype({"Count": "int"})
+
     def postprocess_dataframe_set_index(self):
         self.df = self.df.set_index("Timestamp")
         self.df = self.df.sort_index()
 
 
-    # Output
+    # Output and input
 
     def output_dataframe(self):
         self.df.to_pickle(self.path_dataframe)
         df = self.df.astype("string").replace(',', ' ', regex=True)
         df.to_csv(self.path_csv)
+
+    def read(self):
+        self.df = pd.read_pickle(self.path_dataframe)
+        self.start_date = self.df.index[0].date()
+        self.end_date = self.df.index[-1].date()
+        self.set_title_date()
