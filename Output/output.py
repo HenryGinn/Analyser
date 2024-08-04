@@ -18,7 +18,8 @@ class Output():
             self.title_date = f"From {start} to {end}"
 
     def initiate_figure(self):
-        self.fig, self.ax = plt.subplots(figsize=(14, 4))
+        self.fig = plt.figure(figsize=self.figsize)
+        self.ax = self.fig.add_axes(rect=self.rect)
 
 
     # Peripherals
@@ -42,6 +43,11 @@ class Output():
 
 
     # Output
+
+    def output_figure(self, file_name):
+        match self.output:
+            case "show": plt.show()
+            case "save": self.save_figure(file_name)
 
     def save_figure(self, file_name):
         path = join(self.path_output, f"{file_name}.pdf")

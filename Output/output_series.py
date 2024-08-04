@@ -7,11 +7,11 @@ from Output.output import Output
 
 class OutputSeries(Output):
     
-    def output_series(self, s, name, lower_limit=10):
+    def output_series(self, s, name, y_label=None, lower_limit=10):
         s = pd.Series(s.iloc[:, 0]).copy()
         self.file_name = self.get_series_file_name(name)
         self.output_series_to_text(s, name, lower_limit)
-        self.output_series_to_bar(s, name)
+        self.output_series_to_bar(s, name, y_label)
 
     def output_series_to_text(self, s, name, lower_limit):
         s_text = s[s >= lower_limit]
@@ -23,9 +23,9 @@ class OutputSeries(Output):
             "End": self.end_date}, timestamp=False)
         return file_name
 
-    def output_series_to_bar(self, s, name):
+    def output_series_to_bar(self, s, name, y_label):
         s_bar = s.iloc[:50]
         self.initiate_figure()
         self.ax.bar(s_bar.index, s_bar.values, color=self.color_1)
-        self.set_bar_peripherals(self.ax, name, "Times Played")
-        self.save_figure(self.file_name)
+        self.set_bar_peripherals(self.ax, name, y_label)
+        self.output_figure(self.file_name)
