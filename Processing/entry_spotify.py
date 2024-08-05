@@ -39,4 +39,9 @@ class Entry(TimeSeries):
         self.plot_time_series_date(
             self.df, name, "Date", "Frequency Density")
 
+    def plot_day(self):
+        name = f"Listening History Over a Day of '{self.name}'"
+        self.plot_time_series_day(
+            self.df, name, "Time", "Frequency Density")
+
 defaults.load(Entry)

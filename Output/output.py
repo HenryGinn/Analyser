@@ -21,8 +21,9 @@ class Output():
 
     # Peripherals
 
-    def set_peripherals(self, ax, name, x_label, y_label):
+    def set_peripherals(self, ax, df, name, x_label, y_label):
         self.set_tick_labels(ax)
+        self.set_ticks(ax, df)
         self.set_title(ax, name)
         self.set_axis_labels(ax, x_label, y_label)
     
@@ -41,6 +42,9 @@ class Output():
         ax.set_xticks(ax.get_xticks())
         ax.set_xticklabels(ax.get_xticklabels(), rotation=60,
                            ha='right', fontsize=self.fontsize_ticks)
+
+    def set_ticks(self, ax, df):
+        pass
 
     def set_title(self, ax, name):
         title = add_line_breaks(f"{name} {self.title_date}", length=60)
