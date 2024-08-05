@@ -25,7 +25,7 @@ class OutputSeries(Output):
 
     def output_series_to_bar(self, s, name, y_label):
         s_bar = s.iloc[:50]
-        self.initiate_figure()
+        self.initialise_figure()
         self.ax.bar(s_bar.index, s_bar.values, color=self.color_1)
         self.set_bar_peripherals(self.ax, name, y_label)
         self.output_figure(self.file_name)

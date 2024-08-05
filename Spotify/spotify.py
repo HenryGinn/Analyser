@@ -1,12 +1,12 @@
 from os.path import join
 
 import pandas as pd
-
 from hgutilities import defaults
 from hgutilities.utils import make_folder
 
 from Processing.preprocess_spotify import PreprocessSpotify
 from Output.output_series import OutputSeries
+from Processing.entry_spotify import Entry
 
 
 class Spotify(PreprocessSpotify, OutputSeries):
@@ -67,23 +67,24 @@ class Spotify(PreprocessSpotify, OutputSeries):
                            y_label="Time Played (hours)")
         return df_time
 
-    def histogram(self, attribute):
-        df_hist = self.df.loc[:, [attribute, "TimePlayed"]].copy()
-        top_entries = self.get_top_entries(attribute, df_hist)
-        for entry in top_entries:
-            self.histogram_entry(df_hist, attribute, entry)
+    def set_entries(self, entry_attribute, n=25):
+        top_entries = self.get_top_entries(entry_attribute, self.df, n)
+        entry_objects = [Entry(self, entry_attribute, entry_name)
+                         for entry_name in top_entries]
+        setattr(self, f"{entry_attribute.lower()}s", entry_objects)
 
-    def get_top_entries(self, attribute, df):
-        top_entries = (df.groupby(attribute).sum()
+    def get_top_entries(self, entry_attribute, df, n):
+        top_entries = (df.loc[:, [entry_attribute, "TimePlayed"]]
+                       .groupby(entry_attribute).sum()
                        .sort_values("TimePlayed", ascending=False)
-                       .iloc[:1, 0].index.values)
+                       .iloc[:n, 0].index.values)
         return top_entries
 
-    def histogram_entry(self, df_hist, attribute, entry):
-        df_hist = df_hist.loc[df_hist[attribute] == entry].copy()
-        self.initiate_figure()
-        self.ax.hist(df_hist["TimePlayed"].values, bins=100)
-        self.output_figure("Test")
+    def process_entries(self, entry_attribute, function):
+        attribute_name = f"{entry_attribute.lower()}s"
+        for entry in getattr(self, attribute_name):
+            entry_function = getattr(entry, function)
+            entry_function()
 
 
 defaults.load(Spotify)
