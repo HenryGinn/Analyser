@@ -84,9 +84,8 @@ class PreprocessSpotify(Base):
         self.df.to_pickle(self.path_dataframe)
         df = self.df.astype("string").replace(',', ' ', regex=True)
         df.to_csv(self.path_csv)
+        self.filter_time()
 
     def read(self):
         self.df = pd.read_pickle(self.path_dataframe)
-        self.start_date = self.df.index[0].date()
-        self.end_date = self.df.index[-1].date()
-        self.set_title_date()
+        self.filter_time()

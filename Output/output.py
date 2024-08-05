@@ -12,10 +12,7 @@ class Output():
     def set_title_date(self):
         start = self.start_date.strftime('%B %Y')
         end = self.end_date.strftime('%B %Y')
-        if self.months_back is None:
-            self.title_date = f"Up to {end}"
-        else:
-            self.title_date = f"From {start} to {end}"
+        self.title_date = f"From {start} to {end}"
 
     def initiate_figure(self):
         self.fig = plt.figure(figsize=self.figsize)

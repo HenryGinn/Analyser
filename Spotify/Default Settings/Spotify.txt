@@ -1,4 +1,5 @@
 {
 	"output": "show",
-	"months_back": null
+	"start_date": null,
+	"end_date": null
 }
